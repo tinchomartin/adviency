@@ -1,16 +1,22 @@
 import React from "react";
-import { UnorderedList, ListItem } from "@chakra-ui/react";
+import { Box, Image } from "@chakra-ui/react";
 // import GiftDelete from "../GiftDelete";
 
 function GiftList(props) {
   const { gift } = props;
 
   return (
-    <UnorderedList styleType="none">
-      <ListItem fontSize={24}>{gift.type}</ListItem>
-
-      {/* <ListItem>{gift.quantity}</ListItem> */}
-    </UnorderedList>
+    <Box display="grid" gridTemplateColumns={"50px auto"} gridGap={2}>
+      <Image src={gift.image} alt="Image's gift"></Image>
+      <Box display="grid" gridTemplateRows={"auto auto"}>
+        <Box as="p" fontSize={24}>
+          {gift.type}
+        </Box>
+        <Box as="p" fontSize={12} textAlign="left">
+          {gift.receiver}
+        </Box>
+      </Box>
+    </Box>
   );
 }
 
