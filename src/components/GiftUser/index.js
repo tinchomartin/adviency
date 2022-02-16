@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
 import {
   Box,
   VStack,
@@ -22,11 +23,20 @@ import GiftList from "../GiftList";
 
 function GiftUser() {
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const {
+    isOpen: isOpenEditar,
+    onOpen: onOpenEditar,
+    onClose: onCloseEditar,
+  } = useDisclosure();
+
   const listStorage = JSON.parse(localStorage.getItem("listStorage"));
   const [arr, setArr] = useState(listStorage);
   const [show, setShow] = useState(true);
   const [messageErr, setErr] = useState(false);
+
   const [lista, setLista] = useState({
+    id: "",
     type: "",
     image: "",
     quantity: 0,
@@ -38,7 +48,6 @@ function GiftUser() {
       setArr([...arr, lista]);
       setErr(false);
       setShow(false);
-      // setLista({ type: "" });
     } else {
       setErr(true);
     }
@@ -46,7 +55,8 @@ function GiftUser() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    const { id } = e.target;
+    lista.id = id;
     validation();
   };
 
@@ -56,10 +66,37 @@ function GiftUser() {
 
     setArr(arr.filter((index) => arr[id] !== index));
   };
+
+  const selectEditItem = (item) => {
+    onOpenEditar();
+
+    setLista({
+      id: item.id,
+      type: item.type,
+      image: item.image,
+      quantity: item.quantity,
+      receiver: item.receiver,
+    });
+  };
+
+  const handleEdit = (e) => {
+    e.preventDefault();
+    for (let index = 0; index < arr.length; index++) {
+      const updatedArr = [...arr];
+      if (arr[index].id === lista.id) {
+        arr[index].image = lista.image;
+        arr[index].receiver = lista.receiver;
+        arr[index].type = lista.type;
+        arr[index].quantity = lista.quantity;
+        setArr(updatedArr);
+      }
+    }
+  };
+
   useEffect(() => {
     const arrStorage = JSON.stringify(arr);
     localStorage.setItem("listStorage", arrStorage);
-
+    console.log(arrStorage);
     arr.length > 0 ? setShow(false) : setShow(true);
   }, [arr]);
 
@@ -80,6 +117,7 @@ function GiftUser() {
                 <VStack gap={2}>
                   <Input
                     name="type"
+                    // value={lista.type !== "" ? lista.type : ""}
                     size="md"
                     placeholder="Ingrese el regalo..."
                     onChange={(e) => {
@@ -93,6 +131,7 @@ function GiftUser() {
                   />
                   <Input
                     name="receiver"
+                    // value={lista.receiver !== "" ? lista.receiver : ""}
                     placeholder="Destinatario del regalo"
                     onChange={(e) => {
                       e.preventDefault();
@@ -106,6 +145,7 @@ function GiftUser() {
 
                   <Input
                     placeholder="https://image"
+                    // value={lista.image !== "" ? lista.image : ""}
                     name="image"
                     onChange={(e) => {
                       e.preventDefault(e);
@@ -120,7 +160,7 @@ function GiftUser() {
            
           )} */}
                   <NumberInput
-                    value={lista.quantity}
+                    defaultValue={0}
                     max={20}
                     min={0}
                     onChange={(quantity) => {
@@ -139,6 +179,7 @@ function GiftUser() {
 
                   <Button
                     onClick={handleSubmit}
+                    id={uuidv4()}
                     type="submit"
                     bg="red"
                     p="0 20px"
@@ -161,6 +202,107 @@ function GiftUser() {
 
             <ModalFooter>
               <Button colorScheme="blue" mr={3} onClick={onClose}>
+                Volver
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+
+        <Modal isOpen={isOpenEditar} onClose={onCloseEditar}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader />
+            <ModalCloseButton />
+            <ModalBody>
+              <form>
+                <VStack gap={2}>
+                  <Input
+                    name="type"
+                    value={lista.type !== "" ? lista.type : ""}
+                    size="md"
+                    placeholder="Ingrese el regalo..."
+                    onChange={(e) => {
+                      e.preventDefault();
+                      const { name, value } = e.target;
+                      setLista((prevState) => ({
+                        ...prevState,
+                        [name]: value,
+                      }));
+                    }}
+                  />
+                  <Input
+                    name="receiver"
+                    value={lista.receiver !== "" ? lista.receiver : ""}
+                    placeholder="Destinatario del regalo"
+                    onChange={(e) => {
+                      e.preventDefault();
+                      const { name, value } = e.target;
+                      setLista((prevState) => ({
+                        ...prevState,
+                        [name]: value,
+                      }));
+                    }}
+                  ></Input>
+
+                  <Input
+                    placeholder="https://image"
+                    value={lista.image !== "" ? lista.image : ""}
+                    name="image"
+                    onChange={(e) => {
+                      e.preventDefault(e);
+                      const { name, value } = e.target;
+                      setLista((prevState) => ({
+                        ...prevState,
+                        [name]: value,
+                      }));
+                    }}
+                  ></Input>
+                  {/* {lista.type.length === 0 && (
+           
+          )} */}
+                  <NumberInput
+                    value={lista.quantity !== 0 ? lista.quantity : 0}
+                    max={20}
+                    min={0}
+                    onChange={(quantity) => {
+                      setLista((prevState) => ({
+                        ...prevState,
+                        quantity: quantity,
+                      }));
+                    }}
+                  >
+                    <NumberInputField width="100%" />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
+
+                  <Button
+                    onClick={handleEdit}
+                    // id={lista.uid}
+                    type="submit"
+                    bg="red"
+                    p="0 20px"
+                    size="md"
+                    color="white"
+                    _hover={{ bg: "green" }}
+                    isDisabled={lista.type === "" ? true : false}
+                  >
+                    Editar
+                  </Button>
+                </VStack>
+
+                {messageErr && (
+                  <Box as="p" color="red" display={messageErr}>
+                    El valor ingresado ya se encuentra en el listado
+                  </Box>
+                )}
+              </form>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button colorScheme="blue" mr={3} onClick={onCloseEditar}>
                 Volver
               </Button>
             </ModalFooter>
@@ -192,6 +334,13 @@ function GiftUser() {
                   onClick={handleDelete}
                 >
                   X
+                </Button>
+
+                <Button
+                  colorScheme="blue"
+                  onClick={() => selectEditItem(item, i)}
+                >
+                  E
                 </Button>
               </Box>
             );
