@@ -32,9 +32,6 @@ function GiftUser() {
     onClose: onCloseEditar,
   } = useDisclosure();
 
-  // const listStorage = JSON.parse(localStorage.getItem("listStorage"));
-
-  // const [arr, setArr] = useState(listStorage);
   const [arr, setArr] = useState([]);
 
   const [show, setShow] = useState(true);
@@ -104,9 +101,6 @@ function GiftUser() {
       .then((arr) => setArr(arr.data))
       .catch(console.log)
       .finally(() => setLoading(false));
-    // const arrStorage = JSON.stringify(arr);
-    // localStorage.setItem("listStorage", arrStorage);
-    // console.log(arrStorage);
   }, []);
 
   useEffect(() => {
