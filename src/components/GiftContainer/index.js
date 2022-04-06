@@ -7,7 +7,7 @@ function GiftContainer() {
     <Box
       w="500px"
       minHeight="400px"
-      backgroundColor="#ffffff"
+      backgroundColor="floralwhite"
       textAlign="center"
       borderRadius="50px"
     >
