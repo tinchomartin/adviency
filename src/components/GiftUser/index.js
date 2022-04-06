@@ -19,7 +19,9 @@ import {
   NumberDecrementStepper,
   useDisclosure,
 } from "@chakra-ui/react";
+import Loading from "../Loading";
 import GiftList from "../GiftList";
+import { api } from "../../utils/api";
 
 function GiftUser() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -30,11 +32,14 @@ function GiftUser() {
     onClose: onCloseEditar,
   } = useDisclosure();
 
-  const listStorage = JSON.parse(localStorage.getItem("listStorage"));
-  const [arr, setArr] = useState(listStorage);
+  // const listStorage = JSON.parse(localStorage.getItem("listStorage"));
+
+  // const [arr, setArr] = useState(listStorage);
+  const [arr, setArr] = useState([]);
+
   const [show, setShow] = useState(true);
   const [messageErr, setErr] = useState(false);
-
+  const [loading, setLoading] = useState(true);
   const [lista, setLista] = useState({
     id: "",
     type: "",
@@ -94,11 +99,20 @@ function GiftUser() {
   };
 
   useEffect(() => {
-    const arrStorage = JSON.stringify(arr);
-    localStorage.setItem("listStorage", arrStorage);
-    console.log(arrStorage);
-    arr.length > 0 ? setShow(false) : setShow(true);
-  }, [arr]);
+    api
+      .gifts()
+      .then((arr) => setArr(arr.data))
+      .catch(console.log)
+      .finally(() => setLoading(false));
+    // const arrStorage = JSON.stringify(arr);
+    // localStorage.setItem("listStorage", arrStorage);
+    // console.log(arrStorage);
+  }, []);
+
+  useEffect(() => {
+    api.save(arr).then(console.log).catch(console.log).catch(console.log);
+    arr.length > 0 || loading === true ? setShow(false) : setShow(true);
+  }, [arr, loading]);
 
   return (
     <Box>
@@ -315,7 +329,7 @@ function GiftUser() {
             Esta lista esta vacía, agregame regalos
           </Box>
         )}
-
+        {loading && <Loading />}
         {arr &&
           arr.map((item, i) => {
             return (
