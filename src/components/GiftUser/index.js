@@ -319,7 +319,7 @@ function GiftUser() {
       </Box>
       <Box>
         {show && (
-          <Box as="p" display={show}>
+          <Box as="p" color="black" display={show}>
             Esta lista esta vacía, agregame regalos
           </Box>
         )}
